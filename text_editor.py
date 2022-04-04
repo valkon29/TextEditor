@@ -13,9 +13,11 @@ class TextEditor:
             ('All files', '*.*'))
         self.window.geometry("1000x700")
         self.window.title("TextEditor")
+        self.create_scroll_bar(window)
         self.text = tk.Text(self.window, bg="#333333", fg="#ffa500",
                             font=("Helvetica", "16"), state="normal",
-                            relief=tk.GROOVE)
+                            relief=tk.GROOVE, yscrollcommand=self.scrollbar.set)
+        self.scrollbar.config(command=self.text.yview)
         self.text.pack(fill=tk.BOTH, expand=1)
         self.status = tk.StringVar()
         self.statusbar = tk.Label(window, textvariable=self.status, bd=1,
@@ -44,7 +46,8 @@ class TextEditor:
         file_menu.add_command(label='Save', command=self.save,
                               accelerator="Ctrl+S")
         file_menu.add_command(label='Save as', command=self.save_as_file,
-                              accelerator="Ctrl+Q")
+                              accelerator="Ctrl+A")
+        file_menu.add_separator()
         file_menu.add_command(label='Exit', command=self.exit,
                               accelerator="Ctrl+E")
         self.menubar.add_cascade(label="File", menu=file_menu)
@@ -110,12 +113,16 @@ class TextEditor:
             self.save()
         self.window.destroy()
 
+    def create_scroll_bar(self, window):
+        self.scrollbar = tk.Scrollbar(window)
+        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
     def set_status_bar(self):
         if self.current_file is None:
             self.status.set('Untitled')
             return
         self.status.set(self.current_file)
-        
+
     def check_for_file_in_args(self, *args):
         if len(args[0]) > 1:
             print('hello')
@@ -152,7 +159,8 @@ class TextEditor:
                 cropped_text = text
             new_button = tk.Button(buffer_window,
                                    text=cropped_text,
-                                   command=self.make_button_func(text, buffer_window),
+                                   command=self.make_button_func(text,
+                                                                 buffer_window),
                                    height=2,
                                    width=32,
                                    padx=0, pady=0, wraplength=320)
@@ -167,4 +175,5 @@ class TextEditor:
             index = self.text.index(tk.INSERT)
             self.text.insert(index, text_to_insert)
             buffer_window.destroy()
+
         return func
