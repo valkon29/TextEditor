@@ -109,8 +109,12 @@ class TextEditor:
             input_file.close()
 
     def save_as_file(self, *args):
-        self.current_file = filedialog.asksaveasfilename(defaultextension=".*",
-                                                         filetypes=self.file_types)
+        self.status.set('Saving a file...')
+        file_to_save = filedialog.asksaveasfilename(defaultextension=".*",
+                                                    filetypes=self.file_types)
+        if file_to_save == '':
+            return
+        self.current_file = file_to_save
         text_file = open(self.current_file, 'w')
         text_file.write(self.text.get(1.0, tk.END))
         text_file.close()
