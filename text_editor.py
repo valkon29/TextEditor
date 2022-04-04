@@ -5,7 +5,6 @@ from tkinter import messagebox as mb
 
 class TextEditor:
     def __init__(self, window, *args):
-        print(args)
         self.window = window
         self.current_file = None
         self.file_types = (
@@ -13,7 +12,7 @@ class TextEditor:
             ('All files', '*.*'))
         self.window.geometry("1000x700")
         self.window.title("TextEditor")
-        self.create_scroll_bar(window)
+        self.scrollbar = self.create_scroll_bar(window)
         self.text = tk.Text(self.window, bg="#333333", fg="#ffa500",
                             font=("times new roman", "16", "bold"),
                             state="normal",
@@ -88,7 +87,7 @@ class TextEditor:
         self.status.set('Opening a file...')
         new_file = filedialog.askopenfilename(title="Open file",
                                               filetypes=self.file_types)
-        if new_file is "":
+        if new_file == "":
             return
         self.current_file = new_file
         self.open_file()
@@ -128,9 +127,11 @@ class TextEditor:
             self.save()
         self.window.destroy()
 
-    def create_scroll_bar(self, window):
-        self.scrollbar = tk.Scrollbar(window)
-        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+    @staticmethod
+    def create_scroll_bar(window):
+        scrollbar = tk.Scrollbar(window)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        return scrollbar
 
     def set_status_bar(self):
         if self.current_file is None:
@@ -165,24 +166,36 @@ class TextEditor:
             mb.showinfo("", "Exchange buffer is empty")
             return
         buffer_window = tk.Tk()
-
-        buffer_window.geometry("360x{}".format(str(40 * len(self.buffer))))
         buffer_window.title("Exchange buffer")
+        summary_length = 0
+        for text in self.buffer:
+            summary_length += max(2, len(text) // 48 + 1)
+        buffer_window.geometry("360x{}".format(str(min(summary_length * 21,
+                                                       600))))
+        buffer_frame = tk.Frame(buffer_window)
+        buffer_frame.pack(fill=tk.BOTH, expand=1)
+        buffer_canvas = tk.Canvas(buffer_frame)
+        buffer_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
+        buffer_scroll_bar = tk.Scrollbar(buffer_frame, orient=tk.VERTICAL,
+                                         command=buffer_canvas.yview)
+        buffer_scroll_bar.pack(side=tk.RIGHT, fill=tk.Y)
+        buffer_canvas.configure(yscrollcommand=buffer_scroll_bar.set)
+        buffer_canvas.bind('<Configure>',
+                           lambda e: buffer_canvas.configure(
+                               scrollregion=buffer_canvas.bbox("all")))
+        second_frame = tk.Frame(buffer_canvas)
+        buffer_canvas.create_window((0, 0), window=second_frame, anchor="nw")
 
         cnt = 0
         for text in self.buffer[::-1]:
-            if len(text) > 100:
-                cropped_text = text[:100] + "..."
-            else:
-                cropped_text = text
-            new_button = tk.Button(buffer_window,
-                                   text=cropped_text,
-                                   command=self.make_button_func(text,
-                                                                 buffer_window),
-                                   height=2,
-                                   width=32,
-                                   padx=0, pady=0, wraplength=320)
-            new_button.place(x=20, y=cnt * 40)
+            cropped_text = text
+            tk.Button(second_frame,
+                      text=cropped_text,
+                      command=self.make_button_func(text, buffer_window),
+                      height=max(2, len(cropped_text) // 48 + 1),
+                      width=32,
+                      padx=0, pady=0, wraplength=300).grid(
+                row=cnt, column=0, pady=0, padx=10)
             cnt += 1
 
     def add_to_buffer(self, text):
