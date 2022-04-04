@@ -15,7 +15,7 @@ class TextEditor:
         self.window.title("TextEditor")
         self.create_scroll_bar(window)
         self.text = tk.Text(self.window, bg="#333333", fg="#ffa500",
-                            font=("Helvetica", "16"), state="normal",
+                            font=("times new roman", "16", "bold"), state="normal",
                             relief=tk.GROOVE, yscrollcommand=self.scrollbar.set)
         self.scrollbar.config(command=self.text.yview)
         self.text.pack(fill=tk.BOTH, expand=1)
