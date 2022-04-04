@@ -22,7 +22,7 @@ class TextEditor:
         self.status = tk.StringVar()
         self.statusbar = tk.Label(window, textvariable=self.status, bd=1,
                                   relief=tk.SUNKEN, anchor=tk.N)
-        self.status.set('Untitled')
+        self.set_status_bar()
         self.statusbar.pack(side=tk.BOTTOM, fill=tk.X)
         self.menubar = tk.Menu(window)
         self.set_menu(window)
