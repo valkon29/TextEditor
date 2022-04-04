@@ -15,7 +15,8 @@ class TextEditor:
         self.window.title("TextEditor")
         self.create_scroll_bar(window)
         self.text = tk.Text(self.window, bg="#333333", fg="#ffa500",
-                            font=("times new roman", "16", "bold"), state="normal",
+                            font=("times new roman", "16", "bold"),
+                            state="normal",
                             relief=tk.GROOVE, yscrollcommand=self.scrollbar.set)
         self.scrollbar.config(command=self.text.yview)
         self.text.pack(fill=tk.BOTH, expand=1)
@@ -58,9 +59,19 @@ class TextEditor:
                               accelerator="Ctrl+V")
         edit_menu.add_command(label='Cut', command=self.cut,
                               accelerator="Ctrl+X")
+        edit_menu.add_command(label='Undo', command=self.undo,
+                              accelerator="Ctrl+U")
+        edit_menu.add_separator()
         edit_menu.add_command(label='Buffer', command=self.show_buffer,
                               accelerator="Ctrl+B")
         self.menubar.add_cascade(label="Edit", menu=edit_menu)
+        help_menu = tk.Menu(self.menubar)
+        help_menu.add_command(label="About", command=TextEditor.about)
+        self.menubar.add_cascade(label="Help", menu=help_menu)
+
+    @staticmethod
+    def about(*args):
+        mb.showinfo(message="Text editor for python review\n version 1.1.1")
 
     def set_hot_keys(self):
         self.window.bind('<Control-s>', self.save)
@@ -71,15 +82,19 @@ class TextEditor:
         self.window.bind('<Control-v>', self.paste)
         self.window.bind('<Control-x>', self.cut)
         self.window.bind('<Control-b>', self.show_buffer)
+        self.window.bind('<Control-u>', self.undo)
 
     def open_file_dialog(self, *args):
         self.status.set('Opening a file...')
-        self.text.delete("1.0", tk.END)
-        self.current_file = filedialog.askopenfilename(title="Open file",
-                                                       filetypes=self.file_types)
+        new_file = filedialog.askopenfilename(title="Open file",
+                                              filetypes=self.file_types)
+        if new_file is "":
+            return
+        self.current_file = new_file
         self.open_file()
 
     def open_file(self):
+        self.text.delete("1.0", tk.END)
         file_to_read = open(self.current_file, 'r')
         stuff = file_to_read.read()
         self.text.insert(tk.END, stuff)
@@ -141,6 +156,9 @@ class TextEditor:
 
     def paste(self, *args):
         self.text.event_generate("<<Paste>>")
+
+    def undo(self, *args):
+        self.open_file()
 
     def show_buffer(self, *args):
         if len(self.buffer) == 0:
