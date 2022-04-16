@@ -93,6 +93,7 @@ class TextEditor:
         self.open_file()
 
     def open_file(self):
+        self.ask_to_save_changes()
         self.text.delete("1.0", tk.END)
         file_to_read = open(self.current_file, 'r')
         stuff = file_to_read.read()
@@ -113,6 +114,7 @@ class TextEditor:
         file_to_save = filedialog.asksaveasfilename(defaultextension=".*",
                                                     filetypes=self.file_types)
         if file_to_save == '':
+            self.set_status_bar()
             return
         self.current_file = file_to_save
         text_file = open(self.current_file, 'w')
@@ -121,15 +123,19 @@ class TextEditor:
         self.set_status_bar()
 
     def exit(self, *args):
+        self.ask_to_save_changes()
+        self.window.destroy()
+
+    def ask_to_save_changes(self):
         if not self.is_changes():
             self.window.destroy()
             return
         msg_box = mb.askquestion('Exit Text Editor',
-                                 'You have unsaved changes. Do you want to save them?',
+                                 'You have unsaved changes.'
+                                 'Do you want to save them?',
                                  icon='warning')
         if msg_box == 'yes':
             self.save()
-        self.window.destroy()
 
     @staticmethod
     def create_scroll_bar(window):
@@ -156,6 +162,8 @@ class TextEditor:
 
     def copy(self, *args):
         text = self.text.selection_get()
+        print(text)
+        print(len(text))
         self.add_to_buffer(text)
         self.text.event_generate("<<Copy>>")
 
@@ -163,6 +171,8 @@ class TextEditor:
         self.text.event_generate("<<Paste>>")
 
     def undo(self, *args):
+        if self.current_file is None:
+            return
         self.open_file()
 
     def show_buffer(self, *args):
@@ -173,11 +183,12 @@ class TextEditor:
         buffer_window.title("Exchange buffer")
         summary_length = 0
         for text in self.buffer:
-            summary_length += max(2, len(text) // 48 + 1)
+            summary_length += TextEditor.calculate_number_of_lines(text, 41)
         buffer_window.geometry("360x{}".format(str(min(summary_length * 21,
                                                        600))))
         buffer_frame = tk.Frame(buffer_window)
         buffer_frame.pack(fill=tk.BOTH, expand=1)
+
         buffer_canvas = tk.Canvas(buffer_frame)
         buffer_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
         buffer_scroll_bar = tk.Scrollbar(buffer_frame, orient=tk.VERTICAL,
@@ -194,15 +205,47 @@ class TextEditor:
         for text in self.buffer[::-1]:
             cropped_text = text
             tk.Button(second_frame,
+                      activebackground="black",
+                      activeforeground="white",
                       text=cropped_text,
                       command=self.make_button_func(text, buffer_window),
-                      height=max(2, len(cropped_text) // 48 + 1),
+                      height=TextEditor.calculate_number_of_lines(
+                          cropped_text, 40),
                       width=32,
                       padx=0, pady=0, wraplength=300).grid(
                 row=cnt, column=0, pady=0, padx=10)
             cnt += 1
 
+    @staticmethod
+    def calculate_number_of_lines(text, line_size):
+        current_line_length = 0
+        current_word_length = 0
+        ans = 1
+        index = 0
+        while index < len(text):
+            if text[index] == '\n':
+                current_line_length = 0
+                current_word_length = 0
+                ans += 1
+            elif current_line_length > line_size:
+                if current_word_length < line_size:
+                    index -= current_word_length
+                current_word_length = 0
+                current_line_length = 0
+                ans += 1
+            elif text[index] == ' ':
+                current_word_length = 0
+                current_line_length += 1
+            else:
+                current_line_length += 1
+                current_word_length += 1
+            index += 1
+
+        return max(ans, 2)
+
     def add_to_buffer(self, text):
+        if text == '':
+            return
         self.buffer.append(text)
 
     def make_button_func(self, text_to_insert, buffer_window):
