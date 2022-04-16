@@ -6,7 +6,10 @@
 Редактирование текста, открыть, сохранить файл, сохранить как, выход (при этом спрашивает сохранить изменения, если таковые были), copy/paste/cut/undo. Имеется буфер обмена, в который попадет текст из команд copy & cut. Нажав на соответсвующий текст из представленных в буфере, он вставится в текущую позицию курсора (если передумали вставлять, можно просто закрыть окно буфера). При этом есть меню со всеми этими командами (полоса вверху экрана), где прописаны хоткеи для них и раздел Help. Все хоткеи используют **Ctrl**.
 
 Скрины:  
+<img src="https://github.com/valkon29/TextEditor/blob/dev/images/photo_2022-04-17%2000.32.20.jpeg" width="400"/>
 <img src="https://github.com/valkon29/TextEditor/blob/dev/images/photo_2022-04-17%2000.32.29.jpeg" width="250"/>
+<img src="https://github.com/valkon29/TextEditor/blob/dev/images/photo_2022-04-17%2000.32.36.jpeg" width="400"/>
+<img src="https://github.com/valkon29/TextEditor/blob/dev/images/photo_2022-04-17%2000.32.39.jpeg" width="300"/>
 
 ### Как запустить?
 ```bash
