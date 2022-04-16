@@ -7,8 +7,8 @@
 
 Скрины:  
 <img src="https://github.com/valkon29/TextEditor/blob/dev/images/photo_2022-04-17%2000.32.20.jpeg" width="400"/>
-<img src="https://github.com/valkon29/TextEditor/blob/dev/images/photo_2022-04-17%2000.32.29.jpeg" width="250"/>
 <img src="https://github.com/valkon29/TextEditor/blob/dev/images/photo_2022-04-17%2000.32.36.jpeg" width="400"/>
+<img src="https://github.com/valkon29/TextEditor/blob/dev/images/photo_2022-04-17%2000.32.29.jpeg" width="250"/>
 <img src="https://github.com/valkon29/TextEditor/blob/dev/images/photo_2022-04-17%2000.32.39.jpeg" width="300"/>
 
 ### Как запустить?
